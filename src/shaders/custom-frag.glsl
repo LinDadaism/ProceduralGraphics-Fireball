@@ -28,19 +28,18 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 INCLUDE_TOOL_FUNCTIONS
 
-#define WORLEY 1
-float fbm(vec3 uv) {
+float fbm(vec3 uv, bool worley) {
     float sum = 0.0, noise = 0.0;
     float freq = 5.0;
     float amp = 0.5;
     int octaves = 6;//8;
 
     for(int i = 0; i < octaves; i++) {
-#if WORLEY
+if (worley)
         noise = worleyNoise3D(uv * freq) * amp;
-#else
+else
         noise = abs(perlinNoise3D(uv * freq)) * amp;
-#endif
+
         sum += noise;
         freq *= 2.0;
         amp *= 0.5;
@@ -95,7 +94,13 @@ const int compareDistance = 4; // >= 1
 
 const int r2 = compareDistance * compareDistance;
 const int steps = 6;
-const vec3 colors[steps] = vec3[](vec3(0.133, 0.223, 0.345), vec3(0.270, 0.458, 0.690), vec3(0.458, 0.725, 0.745), vec3(0.815, 0.839, 0.709), vec3(0.976, 0.709, 0.674), vec3(0.933, 0.462, 0.454));
+const vec3 colors[steps] = vec3[](
+    vec3(0.133, 0.223, 0.345), 
+    vec3(0.270, 0.458, 0.690), 
+    vec3(0.458, 0.725, 0.745), 
+    vec3(0.815, 0.839, 0.709), 
+    vec3(0.976, 0.709, 0.674), 
+    vec3(0.933, 0.462, 0.454));
 
 int getPixelStepi(vec2 pixel, vec2 dimensions, float t) {
     return min(max(int(((snoiseFractal(vec3(pixel / dimensions.y, t * 0.05)) + 0.5)) * float(steps)), 0), steps - 1);
@@ -108,17 +113,27 @@ float getPixelStepf(vec2 pixel, vec2 dimensions, float t) {
 void main()
 {
     vec3 color2 = rgb(200.0, 107.0, 20.0);
+    vec3 fireColors[steps] = vec3[](
+        rgb(238.,36.,0.), 
+        rgb(244.,172.,0.), 
+        rgb(255.,219.,0.), 
+        vec3(0.976, 0.709, 0.674),
+        rgb(240.,85.,0.),  
+        rgb(255.,154.,0.));
 
     // Material base color (before shading)
     vec4 diffuseColor = vec4(color2, 1.0);
+    vec4 bumpColor = vec4(rgb(10., 15., 72.), 1.0);
     if (u_BgToggle > 0) {
-        float noise = fbm(fs_Pos.xyz) + 0.6;
-        diffuseColor *= noise;
+        float noise1 = fbm(fs_Pos.xyz, true) + 0.6;
+        float noise2 = fbm(fs_Pos.xyz * easeInOutQuadratic(mod((u_Time + 4.) * 0.01, 7.)), false);
 
-        // Compute final shaded color
+        diffuseColor *= sawtoothWave(noise1, noise2, 10.0);
+
         out_Col = vec4(diffuseColor.rgb, diffuseColor.a);
+        //out_Col = mix(bumpColor * perlinNoise3D(fs_Pos.xyz), out_Col, 0.2);
     } else {
-        float step = getPixelStepf(gl_FragCoord.xy, u_Dimensions.xy, u_Time);
-        out_Col = vec4(colors[int(step)],1) * smoothstep(2.,4., abs(fract(step+.5)-.5) / fwidth(step) ) ;
+        float step = (snoiseFractal(vec3(fs_Pos.xyz * triangleWave(u_Time, 0.1, 1.))) + 0.5) * float(steps);
+        out_Col = vec4(fireColors[int(step)],1) * smootherstep(1.,3., abs(fract(step+.5)-.5) / fwidth(step) ) ;
     }
 }

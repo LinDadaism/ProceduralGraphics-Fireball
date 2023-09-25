@@ -95,11 +95,11 @@ void main() {
     vec4 layer1 = vec4(rgb(255.0, 255.0, 210.0), 1);
 
     // Circle
-    vec3 red = rgb(225.0, 50.0, 70.0);
-    vec4 layer2 = circle(uv, center, radius * abs(cos(u_Time)), red);
+    vec3 red = vec3(0.458, 0.725, 0.745);
+    vec4 layer2 = circle(uv, center, radius * abs(cos(u_Time)) * 0.6, red);
       
     // layer3
-    vec3 blue = rgb(10.0, 50.0, 170.0);
+    vec3 blue = vec3(0.270, 0.458, 0.690);
     vec4 layer3 = circle(uv, center, radius * 0.3, blue);
 
     out_Col = mix(layer1, layer2, layer2.a);

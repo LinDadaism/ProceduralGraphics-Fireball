@@ -78,8 +78,8 @@ void main()
     float noiseXZ = fbm(vec3(vs_Pos) * cubicPulse(vs_Pos.z, -vs_Pos.x, 0.1 * mod(u_Time * 10.0, 7.0)));
     float noiseZX = fbm(vec3(vs_Pos) * cubicPulse(vs_Pos.z, vs_Pos.x, 0.1 * mod(u_Time * 10.0, 9.0)));
 
-    float noise2 = worleyNoise3D(vec3(vs_Pos * easeInOutQuadratic(u_Time * 0.1 + 10.0)));
-    float noise3 = smoothstep(noiseXY, noise2, abs(cos(u_Time)));
+    float noise2 = worleyNoise3D(vec3(vs_Pos))*easeInOutQuadratic(u_Time * 0.1 + 10.0);
+    float noise3 = bias(1., noise2) + 0.2;
     
     if (u_DeformToggle > 0)
     {
@@ -88,10 +88,7 @@ void main()
         fs_Pos += normalize(fs_Nor) * noiseXZ * 0.25;
         fs_Pos -= normalize(fs_Nor) * noiseZX * 0.25;
 
-        // fs_Pos += normalize(fs_Nor) * squareWave(noise3, noiseXY, noise2);
-        // fs_Pos += normalize(fs_Nor) * squareWave(noise3, noiseYX, noise2);
-        // fs_Pos += normalize(fs_Nor) * squareWave(parabola(noiseXZ, noise2), noiseXZ, noise2);
-        // fs_Pos += normalize(fs_Nor) * squareWave(parabola(noiseZX, noise2), noiseZX, noise2);
+        fs_Pos += normalize(fs_Nor) * 0.2 * noise3;
     }
 
     /************************** End: Apply deformation ************************/
@@ -99,7 +96,7 @@ void main()
     vec4 modelposition = u_Model * fs_Pos;   // Temporarily store the transformed vertex positions for use below
     fs_Pos = modelposition;
 
-    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
+    //fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
     gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices
