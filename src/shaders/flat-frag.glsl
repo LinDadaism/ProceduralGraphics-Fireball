@@ -4,7 +4,11 @@ precision highp float;
 uniform vec3 u_Eye, u_Ref, u_Up;
 uniform vec2 u_Dimensions;
 uniform float u_Time;
+
 uniform int u_BgToggle;
+uniform float u_BgSpeed;
+uniform float u_BgDist;
+uniform float u_BgZoom;
 
 in vec2 fs_Pos;
 out vec4 out_Col;
@@ -69,10 +73,9 @@ float fbm(vec3 uv) {
 
 void main() {
   if (u_BgToggle > 0) {
-    // TODO: make these GUI adjustables
-    float speed = 100.0;
-    float dist = 100.0; 
-    float zoom = 0.001;
+    float speed = u_BgSpeed;
+    float dist = u_BgDist; 
+    float zoom = u_BgZoom;
     vec3 color = vec3(0.933, 0.169, 0.1);
 
     // a intensity from noise
@@ -86,13 +89,24 @@ void main() {
     out_Col = vec4(color * a, 1.0);
   } else {
     // test using my custom flower from lab 1
+    vec3 col1 = rgb(26.0,209.0,221.0);
+    vec3 col2 = rgb(131.0,220.0,147.0);
+    vec3 col3 = rgb(188.0,0.0,208.0);
+    vec3 col4 = rgb(255.0, 255.0, 210.0);
+    vec3 col5 = rgb(255.0,255.0,255.0);
+
     vec2 uv = vec2(gl_FragCoord.xy);
     vec2 center = u_Dimensions.xy * 0.5;
 
     float radius = 2.0 * computeRadius(uv);
 
     // Background layer
-    vec4 layer1 = vec4(rgb(255.0, 255.0, 210.0), 1);
+    // vec4 layer1 = vec4(rgb(255.0, 255.0, 210.0), 1);
+	  vec4 layer1 = vec4(col4, 1.0);
+    float bgT = smoothstep(0.0,0.5,sin(0.2*(uv.x+u_Time*15.0)));
+    layer1 = mix(layer1, vec4(col2, 1.0), bgT);
+    vec4 layerPlain = circle(uv, center, 0.6 * u_Dimensions.y, col4);
+    layer1 = mix(layer1, layerPlain, layerPlain.a);
 
     // Circle
     vec3 red = vec3(0.458, 0.725, 0.745);

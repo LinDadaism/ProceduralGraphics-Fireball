@@ -42,6 +42,13 @@ class ShaderProgram {
   unifBgToggle: WebGLUniformLocation;
   unifDeformToggle: WebGLUniformLocation;
 
+  unifBgSpeed: WebGLUniformLocation;
+  unifBgDist: WebGLUniformLocation;
+  unifBgZoom: WebGLUniformLocation; 
+  unifFbmFreq: WebGLUniformLocation;
+  unifFbmAmp: WebGLUniformLocation;
+  unifFbmOct: WebGLUniformLocation;
+
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
 
@@ -69,6 +76,13 @@ class ShaderProgram {
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
     this.unifBgToggle   = gl.getUniformLocation(this.prog, "u_BgToggle");
     this.unifDeformToggle = gl.getUniformLocation(this.prog, "u_DeformToggle");
+  
+    this.unifBgSpeed = gl.getUniformLocation(this.prog, "u_BgSpeed");;
+    this.unifBgDist = gl.getUniformLocation(this.prog, "u_BgDist");;
+    this.unifBgZoom = gl.getUniformLocation(this.prog, "u_BgZoom");; 
+    this.unifFbmFreq = gl.getUniformLocation(this.prog, "u_FbmFreq");;
+    this.unifFbmAmp = gl.getUniformLocation(this.prog, "u_FbmAmp");;
+    this.unifFbmOct = gl.getUniformLocation(this.prog, "u_FbmOct");;
   }
 
   use() {
@@ -141,6 +155,29 @@ class ShaderProgram {
 
     if (this.unifDeformToggle !== -1) {
       gl.uniform1i(this.unifDeformToggle, deform ? 1 : -1);
+    }
+  }
+
+  setNoiseValues(bgSpeed: number, bgDist: number, bgZoom: number, 
+    fbmFreq: number, fbmAmp: number, fbmOct: number) {
+    this.use();
+    if (this.unifBgSpeed !== -1) {
+      gl.uniform1f(this.unifBgSpeed, bgSpeed);
+    }
+    if (this.unifBgDist !== -1) {
+      gl.uniform1f(this.unifBgDist, bgDist);
+    }
+    if (this.unifBgZoom !== -1) {
+      gl.uniform1f(this.unifBgZoom, bgZoom);
+    }
+    if (this.unifFbmFreq !== -1) {
+      gl.uniform1f(this.unifFbmFreq, fbmFreq);
+    }
+    if (this.unifFbmAmp !== -1) {
+      gl.uniform1f(this.unifFbmAmp, fbmAmp);
+    }
+    if (this.unifFbmOct !== -1) {
+      gl.uniform1i(this.unifFbmOct, fbmOct);
     }
   }
 

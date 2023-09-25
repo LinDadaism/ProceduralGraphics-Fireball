@@ -13,10 +13,18 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   tesselations: 5,
-  'Load Scene': loadScene,   // A function pointer, essentially
+  'Reset Scene': loadScene,   // A function pointer, essentially
   colorRGB: [200, 50, 30],  // RGB array, default to red
-  'Background': true,
+  'Stylized': false,
   'Deformation': true,
+  
+  backgroundRingSpeed: 100.0,
+  backgroundRingDist: 100.0,
+  backgroundRingZoom: 0.001,
+
+  fireballFrequency: 2.0,
+  fireballAmplitude: 0.5,
+  fbmOctaves: 6,
 };
 
 let icosphere: Icosphere;
@@ -41,7 +49,18 @@ function loadScene() {
   square.create();
   cube = new Cube(cubePos, cubeScale);
   cube.create();
-  // timer = 0;
+  timer = 0;
+
+  // reset controls
+  controls['Stylized'] = false;
+  controls['Deformation'] = true;
+  controls.backgroundRingSpeed = 100.0;
+  controls.backgroundRingDist = 100.0;
+  controls.backgroundRingZoom = 0.001;
+
+  controls.fireballFrequency = 2.0;
+  controls.fireballAmplitude = 0.5;
+  controls.fbmOctaves =  6;
 }
 
 function main() {
@@ -70,10 +89,16 @@ function main() {
   // Add controls to the gui
   const gui = new DAT.GUI();
   gui.add(controls, 'tesselations', 0, 8).step(1);
-  gui.add(controls, 'Load Scene');
+  gui.add(controls, 'Reset Scene');
   gui.addColor(controls, 'colorRGB');
-  gui.add(controls, 'Background');
+  gui.add(controls, 'Stylized');
   gui.add(controls, 'Deformation');
+  gui.add(controls, 'backgroundRingSpeed', 0, 200).step(0.1);
+  gui.add(controls, 'backgroundRingDist', 0, 200).step(0.1);
+  gui.add(controls, 'backgroundRingZoom', 0.001, 0.01).step(0.001);
+  gui.add(controls, 'fireballFrequency', 0, 8).step(0.1);
+  gui.add(controls, 'fireballAmplitude', 0, 5).step(0.1);
+  gui.add(controls, 'fbmOctaves', 0, 16).step(1);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -110,6 +135,7 @@ function main() {
 
   // This function will be called every frame
   function tick() {
+    if (timer < 0.000001) camera.reset(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
     camera.update();
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -126,8 +152,24 @@ function main() {
     let color = convertRGBToVec4.apply(null, controls.colorRGB);
     disco.setGeometryColor(color);
     disco.setTime(timer);
-    disco.setToggles(controls['Background'], controls.Deformation);
-    flat.setToggles(controls['Background'], controls.Deformation);
+    disco.setToggles(!controls['Stylized'], controls.Deformation);
+    flat.setToggles(!controls['Stylized'], controls.Deformation);
+    disco.setNoiseValues(
+      controls.backgroundRingSpeed,
+      controls.backgroundRingDist,
+      controls.backgroundRingZoom,
+      controls.fireballFrequency,
+      controls.fireballAmplitude,
+      controls.fbmOctaves
+    );
+    flat.setNoiseValues(
+      controls.backgroundRingSpeed,
+      controls.backgroundRingDist,
+      controls.backgroundRingZoom,
+      controls.fireballFrequency,
+      controls.fireballAmplitude,
+      controls.fbmOctaves
+    );
 
     gl.disable(gl.DEPTH_TEST);
     renderer.render(camera, flat, [

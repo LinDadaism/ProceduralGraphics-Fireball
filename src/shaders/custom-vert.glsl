@@ -20,7 +20,11 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 uniform float u_Time;
 uniform vec3 u_Eye, u_Ref, u_Up;
+
 uniform int u_DeformToggle;
+uniform float u_FbmFreq;
+uniform float u_FbmAmp;
+uniform int u_FbmOct;
 
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
@@ -42,9 +46,9 @@ INCLUDE_TOOL_FUNCTIONS
 #define PERLIN 0
 float fbm(vec3 uv) {
     float sum = 0.0, noise = 0.0;
-    float freq = 2.0;
-    float amp = 0.5;
-    int octaves = 6;//8;
+    float freq = u_FbmFreq;
+    float amp = u_FbmAmp;
+    int octaves = u_FbmOct;
 
     for(int i = 0; i < octaves; i++) {
 #if WORLEY
