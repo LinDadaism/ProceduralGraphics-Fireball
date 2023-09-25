@@ -83,8 +83,7 @@ void main() {
     
     vec2 sampleCoord = vec2(gl_FragCoord.x, gl_FragCoord.y - u_Time*speed); 
     float i = fbm(vec3(sampleCoord, 0.0) * zoom);
-    a *= a; 
-    a /= i*2.0; 
+    a *= easeInQuadratic(a) / (i * 2.); 
 
     out_Col = vec4(color * a, 1.0);
   } else {

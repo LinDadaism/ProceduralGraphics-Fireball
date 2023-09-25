@@ -1,5 +1,21 @@
 # [Project 1: Noise](https://github.com/CIS-566-Fall-2022/hw01-fireball-base)
 
+## Results
+
+### [Live Demo](https://github.com/utkarshdwivedi3997/cis566-lab01-toolbox-functions/tree/main)
+
+![fireball](img/fireball.png)
+*Figure 1: Fireball*
+
+![stylized lavaball](img/stylized.png)
+*Figure 2: Stylized Lava Ball with [Custom Flower from Lab 01 (Collabed with Utkarsh)](https://github.com/utkarshdwivedi3997/cis566-lab01-toolbox-functions/tree/main)*
+
+### Descriptions
+- **Fireball**: vertex deformation using FBM sampling 3D Worley noise with cubic pulse and ease-in-ease-out quadratic toolbox fucntions on u_Time to create animated variation; color variation created by applying sawtooth wave function on two FBM noises; background ring simply created with FBM sampling 3D Perlin noise in a fragment shader.
+
+- **Stylized Lava Ball**: same vertex deformation as Fireball, color variation achieved by taking multiple steps of fractal 3D noise sampled with triangle waved u_Time * fs_Pos.xyz, and smoothstep them together.
+
+
 ## Objective
 
 Get comfortable with using WebGL and its shaders to generate an interesting 3D, continuous surface using a multi-octave noise algorithm.
