@@ -2,7 +2,7 @@
 
 ## Results
 
-### [Live Demo](https://github.com/utkarshdwivedi3997/cis566-lab01-toolbox-functions/tree/main)
+### [Live Demo](https://lindadaism.github.io/ProceduralGraphics-Fireball/)
 
 ![fireball](img/fireball.png)
 *Figure 1: Fireball*
